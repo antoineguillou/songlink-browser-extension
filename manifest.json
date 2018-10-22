@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+  "name": "Songlink",
+  "description": "Share track on Songlink",
+  "version": "1.1",
+  "author": "@starfennec",
+  "background": {
+    "scripts": ["script.js"],
+    "persistent": false
+  },
+  "browser_action": {},
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "permissions": ["tabs", "clipboardWrite"]
+}
