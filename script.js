@@ -1,74 +1,101 @@
-function copyToClipboard(text) {
-    var selected = false;
-    var el = document.createElement('textarea');
-    el.value = text;
-    el.setAttribute('readonly', '');
-    el.style.position = 'absolute';
-    el.style.left = '-9999px';
-    document.body.appendChild(el);
-    if (document.getSelection().rangeCount > 0) {
-        selected = document.getSelection().getRangeAt(0)
-    }
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    if (selected) {
-        document.getSelection().removeAllRanges();
-        document.getSelection().addRange(selected);
-    }
-
-    chrome.tabs.create({ url: text });
+var options = {
+  clipboard: true,
+  tab: true
+}
+var copyToClipboard = function(text) {
+  var selected = false;
+  var el = document.createElement('textarea');
+  el.value = text;
+  el.setAttribute('readonly', '');
+  el.style.position = 'absolute';
+  el.style.left = '-9000em';
+  document.body.appendChild(el);
+  if (document.getSelection().rangeCount > 0) {
+    selected = document.getSelection().getRangeAt(0)
+  }
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
+  if (selected) {
+    document.getSelection().removeAllRanges();
+    document.getSelection().addRange(selected);
+  }
 };
+
+var buttonActions = function(url){
+  if(options.clipboard){ copyToClipboard(url); }
+  if(options.tab){ chrome.tabs.create({ url: url }); }
+}
+
+// Google play Music
+var getGPMURL = function(tabs){
+  chrome.tabs.sendMessage(tabs[0].id, {action: "get_googlemusic_id"}, function(response){
+    var id = response.id;
+    if(id !== null){
+      var shareurl = "https://play.google.com/music/m/"+id;
+      buttonActions('https://song.link/'+encodeURI(shareurl));
+    }
+  });
+}
+
+// Spotify
+var getSpotifyURL = function(tabs){
+  var url = tabs[0].url;
+  var re = /\/album\/([a-zA-Z0-9]+)/g;
+  var match = re.exec(url);
+  var id = match[1];
+  var shareurl = "https://open.spotify.com/album/"+id;
+  buttonActions('https://song.link/'+encodeURI(shareurl));
+}
+
+// Apple Music
+var getAppleMusicURL = function(tabs){
+  var url = tabs[0].url;
+  var re = /\/album\/\S+\/([a-zA-Z0-9]+)/g;
+  var match = re.exec(url);
+  var id = match[1];
+  var shareurl = "https://itunes.apple.com/album/"+id;
+  buttonActions('https://song.link/'+encodeURI(shareurl));
+}
+
+// Deezer
+var getDeezerURL = function(tabs){
+  var url = tabs[0].url;
+  var re = /\/album\/([a-zA-Z0-9]+)/g;
+  var match = re.exec(url);
+  var id = match[1];
+  var shareurl = "https://www.deezer.com/en/album/"+id;
+  buttonActions('https://song.link/'+encodeURI(shareurl));
+}
+
+// Use full URL
+var getCurrentUrl = function(tabs){
+  var url = tabs[0].url;
+  buttonActions('https://song.link/'+encodeURI(url));
+}
 
 chrome.browserAction.onClicked.addListener(function(tab){
   chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function (tabs) {
     var url = tabs[0].url;
 
-    if(tabs[0].url.indexOf('play.google.com/music') > -1){ // Google play Music
-      // var re = /\/album\/(\S+?)\//g;
-      // var match = re.exec(url);
-      // if(match){
-      //   var id = match[1];
-      //   var shareurl = "https://play.google.com/music/m/"+id;
-      //   copyToClipboard('https://song.link/'+encodeURI(shareurl));
-      // }
-      chrome.tabs.sendMessage(tabs[0].id, {action: "get_googlemusic_id"}, function(response){
-        var id = response.id;
-        var shareurl = "https://play.google.com/music/m/"+id;
-        copyToClipboard('https://song.link/'+encodeURI(shareurl));
-      });
-
-    } else if(tabs[0].url.indexOf('open.spotify.com') > -1){ // Spotify
-      var re = /\/album\/([a-zA-Z0-9]+)/g;
-      var match = re.exec(url);
-      var id = match[1];
-      var shareurl = "https://open.spotify.com/album/"+id;
-      copyToClipboard('https://song.link/'+encodeURI(shareurl));
-    } else if(tabs[0].url.indexOf('deezer.com') > -1){ // Deezer
-      var re = /\/album\/([a-zA-Z0-9]+)/g;
-      var match = re.exec(url);
-      var id = match[1];
-      var shareurl = "https://www.deezer.com/en/album/"+id;
-      copyToClipboard('https://song.link/'+encodeURI(shareurl));
-    } else if(tabs[0].url.indexOf('itunes.apple.com') > -1){ // Apple Music
-      var re = /\/album\/\S+\/([a-zA-Z0-9]+)/g;
-      var match = re.exec(url);
-      var id = match[1];
-      var shareurl = "https://itunes.apple.com/album/"+id;
-      copyToClipboard('https://song.link/'+encodeURI(shareurl));
-    } else if(tabs[0].url.indexOf('listen.tidal.com') > -1){ // Tidal
-      copyToClipboard('https://song.link/'+encodeURI(url));
-    } else if(tabs[0].url.indexOf('soundcloud.com') > -1){ // Soundcloud
-      copyToClipboard('https://song.link/'+encodeURI(url));
-    } else if(tabs[0].url.indexOf('tidal.com') > -1){ // Tidal
-      copyToClipboard('https://song.link/'+encodeURI(url));
-    } else if(tabs[0].url.indexOf('pandora.com') > -1){ // Pandora
-      copyToClipboard('https://song.link/'+encodeURI(url));
-    } else if(tabs[0].url.indexOf('music.yandex.com') > -1){ // Yandex
-      copyToClipboard('https://song.link/'+encodeURI(url));
-    } else if(tabs[0].url.indexOf('youtube.com/watch') > -1){ // Youtube
-      copyToClipboard('https://song.link/'+encodeURI(url));
+    if(url.indexOf('play.google.com/music') > -1){
+      getGPMURL(tabs);
+    } else if(url.indexOf('open.spotify.com') > -1){
+      getSpotifyURL(tabs);
+    } else if(url.indexOf('itunes.apple.com') > -1){
+      getAppleMusicURL(tabs);
+    } else if(url.indexOf('deezer.com') > -1){
+      getDeezerURL(tabs);
+    } else if(url.indexOf('listen.tidal.com/album') > -1 || url.indexOf('listen.tidal.com/track') > -1){
+      getCurrentUrl(tabs);
+    } else if(url.indexOf('soundcloud.com') > -1){
+      getCurrentUrl(tabs);
+    } else if(url.indexOf('pandora.com/artist/') > -1){
+      getCurrentUrl(tabs);
+    } else if(url.indexOf('music.yandex.com/album/') > -1 || url.indexOf('music.yandex.ru/album/') > -1){
+      getCurrentUrl(tabs);
+    } else if(url.indexOf('youtube.com/watch') > -1){
+      getCurrentUrl(tabs);
     }
   });
-
 });
