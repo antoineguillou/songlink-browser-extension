@@ -1,7 +1,5 @@
-var options = {
-  clipboard: true,
-  tab: true
-}
+var options = {}
+
 var copyToClipboard = function(text) {
   var selected = false;
   var el = document.createElement('textarea');
@@ -23,8 +21,14 @@ var copyToClipboard = function(text) {
 };
 
 var buttonActions = function(url){
-  if(options.clipboard){ copyToClipboard(url); }
-  if(options.tab){ chrome.tabs.create({ url: url }); }
+  chrome.storage.sync.get({
+    copyToClipboard: true,
+    openNewTab: true
+  }, function(items) {
+    if(items.copyToClipboard){ copyToClipboard(url); }
+    if(items.openNewTab){ chrome.tabs.create({ url: url }); }
+  });
+
 }
 
 // Google play Music

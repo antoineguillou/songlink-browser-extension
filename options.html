@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Options Songlink for Chrome</title>
+    <meta name="description" content="Options for Songlink Chrome extension">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.png">
+    <style type="text/css">
+      body{
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="options">
+      <p><strong>Choose what the songlink button should do :</strong></p>
+      <p>
+        <label>
+          <input type="checkbox" id="copyToClipboard" name="copytoclipboard">
+          Copy songlink to clipboard
+        </label>
+      </p>
+      <p>
+        <label>
+          <input type="checkbox" id="openNewTab" name="openNewTab">
+          Open songlink in new tab
+        </label>
+      </p>
+      <div id="status"></div>
+    </div>
+
+    <script src="options.js"></script>
+  </body>
+</html>
