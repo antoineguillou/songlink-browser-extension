@@ -23,7 +23,7 @@ var updateTabIcon= function(){
   });
 }
 
-var copyToClipboard = function(text) {
+var copyToClipboard = function(text, tabs) {
   var selected = false;
   var el = document.createElement('textarea');
   el.value = text;
@@ -41,14 +41,15 @@ var copyToClipboard = function(text) {
     document.getSelection().removeAllRanges();
     document.getSelection().addRange(selected);
   }
+  chrome.tabs.sendMessage(tabs[0].id, {action: "message", message: "Songlink copied to clipboard"}, function(response){});
 };
 
-var buttonActions = function(url){
+var buttonActions = function(url, tabs){
   chrome.storage.sync.get({
     copyToClipboard: true,
     openNewTab: true
   }, function(items) {
-    if(items.copyToClipboard){ copyToClipboard(url); }
+    if(items.copyToClipboard){ copyToClipboard(url, tabs); }
     if(items.openNewTab){ chrome.tabs.create({ url: url }); }
   });
 
@@ -60,7 +61,7 @@ var getGPMURL = function(tabs){
     var id = response.id;
     if(id !== null){
       var shareurl = "https://play.google.com/music/m/"+id;
-      buttonActions(prependUrl+encodeURI(shareurl));
+      buttonActions(prependUrl+encodeURI(shareurl), tabs);
     }
   });
 }
@@ -73,7 +74,7 @@ var getSpotifyURL = function(tabs){
   if(match){
     var id = match[1];
     var shareurl = "https://open.spotify.com/album/"+id;
-    buttonActions(prependUrl+encodeURI(shareurl));
+    buttonActions(prependUrl+encodeURI(shareurl), tabs);
   }
 }
 
@@ -85,7 +86,7 @@ var getAppleMusicURL = function(tabs){
   if(match){
     var id = match[1];
     var shareurl = "https://itunes.apple.com/album/"+id;
-    buttonActions(prependUrl+encodeURI(shareurl));
+    buttonActions(prependUrl+encodeURI(shareurl), tabs);
   }
 }
 
@@ -97,14 +98,14 @@ var getDeezerURL = function(tabs){
   if(match){
     var id = match[1];
     var shareurl = "https://www.deezer.com/en/album/"+id;
-    buttonActions(prependUrl+encodeURI(shareurl));
+    buttonActions(prependUrl+encodeURI(shareurl), tabs);
   }
 }
 
 // Use full URL
 var getCurrentUrl = function(tabs){
   var url = tabs[0].url;
-  buttonActions(prependUrl+encodeURI(url));
+  buttonActions(prependUrl+encodeURI(url), tabs);
 }
 
 // Update Icon if URL is valid

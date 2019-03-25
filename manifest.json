@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Songlink",
   "description": "Share music with Songlink. ",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "author": "@starfennec",
   "homepage_url": "https://chrome.google.com/webstore/detail/songlink/njnlopjiecpncchdmeeknhggbggolalc",
   "background": {
@@ -10,10 +10,14 @@
     "persistent": false
   },
   "content_scripts": [
-   {
-     "matches": ["https://play.google.com/music/*"],
-     "js": ["googlePlayMusic.js"]
-   }
+    {
+      "matches": ["<all_urls>"],
+      "js": ["messages.js"]
+    },
+    {
+      "matches": ["https://play.google.com/music/*"],
+      "js": ["googlePlayMusic.js"]
+    }
  ],
   "page_action": {
     "default_icon": {
