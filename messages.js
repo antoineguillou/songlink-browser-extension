@@ -4,7 +4,6 @@ var createMessage = function(text){
   el.appendChild(textnode);
   el.id = "songlink_message";
 
-
   Object.assign(el.style,{
     backgroundColor: '#fff',
     border: '1px solid #DAD9DA',
