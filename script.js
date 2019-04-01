@@ -6,7 +6,10 @@ var supportedDomains = [
   'open.spotify.com/album/',
   'play.spotify.com/track/',
   'play.spotify.com/album/',
-  'youtube.com/watch/',
+
+  // no trailing slash here bc most YouTube URLs are of format
+  // youtube.com/watch?v=a1b2c3d4
+  'youtube.com/watch',
   'youtube.com/embed/',
   'youtu.be/',
   'music.youtube.com/',
