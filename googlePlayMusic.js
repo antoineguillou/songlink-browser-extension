@@ -8,7 +8,6 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
         albumId = row.getAttribute('data-matched-id');
       }
     }
-
     sendResponse({
       id: albumId
     });

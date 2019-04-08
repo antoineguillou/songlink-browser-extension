@@ -6,9 +6,6 @@ var supportedDomains = [
   'open.spotify.com/album/',
   'play.spotify.com/track/',
   'play.spotify.com/album/',
-
-  // no trailing slash here bc most YouTube URLs are of format
-  // youtube.com/watch?v=a1b2c3d4
   'youtube.com/watch',
   'youtube.com/embed/',
   'youtu.be/',
@@ -38,17 +35,19 @@ var isSupportedUrl = function(url) {
   });
 };
 
-var updateTabIcon = function() {
+var updateTabIcon = function(tab) {
   chrome.tabs.query({ active: true, lastFocusedWindow: true }, function(tabs) {
-    var url = tabs[0].url;
-    chrome.pageAction.hide(tabs[0].id);
-    if (isSupportedUrl(url)) {
-      chrome.pageAction.show(tabs[0].id);
+    if(tabs[0]){
+      var url = tabs[0].url;
+      var tabId = tabs[0].id
+      if (isSupportedUrl(url)) {
+        chrome.pageAction.show(tabId);
+      }
     }
   });
 };
 
-var copyToClipboard = function(text) {
+var copyToClipboard = function(text, tabs) {
   var selected = false;
   var el = document.createElement('textarea');
   el.value = text;
@@ -66,9 +65,10 @@ var copyToClipboard = function(text) {
     document.getSelection().removeAllRanges();
     document.getSelection().addRange(selected);
   }
+  chrome.tabs.sendMessage(tabs[0].id, {action: "message", message: "Songlink copied to clipboard"});
 };
 
-var doActions = function(url) {
+var doActions = function(url, tabs) {
   chrome.storage.sync.get(
     {
       copyToClipboard: true,
@@ -76,7 +76,7 @@ var doActions = function(url) {
     },
     function(items) {
       if (items.copyToClipboard) {
-        copyToClipboard(url);
+        copyToClipboard(url, tabs);
       }
       if (items.openNewTab) {
         chrome.tabs.create({ url: url });
@@ -92,12 +92,8 @@ var getSonglinkUrl = function(url) {
 };
 
 // Update Icon if URL is valid
-chrome.tabs.onActivated.addListener(function(tab) {
-  updateTabIcon();
-});
-
 chrome.tabs.onUpdated.addListener(function(tab) {
-  updateTabIcon();
+  updateTabIcon(tab);
 });
 
 // Click action
@@ -115,7 +111,7 @@ chrome.pageAction.onClicked.addListener(function(tab) {
           if (id !== null) {
             var gpmUrl = 'https://play.google.com/music/m/' + id;
             var songlinkUrl = getSonglinkUrl(gpmUrl);
-            return doActions(songlinkUrl);
+            return doActions(songlinkUrl, tabs);
           }
         }
       );
@@ -123,7 +119,7 @@ chrome.pageAction.onClicked.addListener(function(tab) {
 
     if (isSupportedUrl(url)) {
       var songlinkUrl = getSonglinkUrl(url);
-      return doActions(songlinkUrl);
+      return doActions(songlinkUrl, tabs);
     }
   });
 });

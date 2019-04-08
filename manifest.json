@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Songlink",
   "description": "Share music with Songlink. ",
-  "version": "1.4",
+  "version": "1.4.1",
   "author": "@starfennec",
   "homepage_url": "https://chrome.google.com/webstore/detail/songlink/njnlopjiecpncchdmeeknhggbggolalc",
   "background": {
@@ -11,11 +11,31 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": [
+        "https://*.song.link/*",
+        "*://itunes.apple.com/*",
+        "*://*.itun.es/*",
+        "*://*.spotify.com/*",
+        "*://*.youtube.com/*",
+        "*://*.youtu.be/*",
+        "*://*.deezer.com/*",
+        "*://*.tidal.com/*",
+        "*://*.napster.com/*",
+        "*://play.google.com/music/*",
+        "*://play.google.com/store/*",
+        "*://*.soundcloud.com/*",
+        "*://music.amazon.com/*",
+        "*://*.amazon.com/*",
+        "*://music.yandex.com/*",
+        "*://music.yandex.ru/*",
+        "*://*.spinrilla.com/mixtapes/*",
+        "*://*.spinrilla.com/songs/*",
+        "*://*.pandora.com/*"
+      ],
       "js": ["messages.js"]
     },
     {
-      "matches": ["https://play.google.com/music/*"],
+      "matches": ["*://play.google.com/music/*"],
       "js": ["googlePlayMusic.js"]
     }
  ],
@@ -35,5 +55,5 @@
     "page": "options.html",
     "open_in_tab": false
   },
-  "permissions": ["activeTab", "tabs", "clipboardWrite", "storage"]
+  "permissions": ["activeTab", "clipboardWrite", "storage", "tabs"]
 }
