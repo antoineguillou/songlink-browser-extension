@@ -2,12 +2,18 @@
   "manifest_version": 2,
   "name": "Songlink",
   "description": "Share music with Songlink. ",
-  "version": "1.4.2",
+  "version": "1.5",
   "author": "@starfennec",
-  "homepage_url": "https://chrome.google.com/webstore/detail/songlink/njnlopjiecpncchdmeeknhggbggolalc",
+  "homepage_url": "https://songlink.glitch.me/",
   "background": {
     "scripts": ["script.js"],
     "persistent": false
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "songlink@song.link",
+      "strict_min_version": "48.0"
+    }
   },
   "content_scripts": [
     {
@@ -42,18 +48,36 @@
   "page_action": {
     "default_icon": {
       "16": "icons/icon16.png",
+      "20": "icons/icon20.png",
+      "40": "icons/icon40.png",
+      "44": "icons/icon44.png",
       "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
-    }
+      "50": "icons/icon50.png",
+      "128": "icons/icon128.png",
+      "150": "icons/icon150.png",
+      "176": "icons/icon176.png"
+    },
+    "default_title": "Songlink"
   },
   "icons": {
     "16": "icons/icon16.png",
+    "20": "icons/icon20.png",
+    "40": "icons/icon40.png",
+    "44": "icons/icon44.png",
     "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+    "50": "icons/icon50.png",
+    "128": "icons/icon128.png",
+    "150": "icons/icon150.png",
+    "176": "icons/icon176.png"
   },
   "options_ui": {
     "page": "options.html",
     "open_in_tab": false
   },
-  "permissions": ["activeTab", "clipboardWrite", "storage", "tabs"]
+  "permissions": [
+    "activeTab",
+    "clipboardWrite",
+    "storage",
+    "tabs"
+  ]
 }

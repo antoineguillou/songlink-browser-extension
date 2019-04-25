@@ -1,7 +1,13 @@
+window.browser = (function () {
+  return window.msBrowser ||
+    window.browser ||
+    window.chrome;
+})();
+
 function save_options() {
   var copyToClipboard = document.getElementById('copyToClipboard').checked;
   var openNewTab = document.getElementById('openNewTab').checked;
-  chrome.storage.sync.set({
+  browser.storage.sync.set({
     copyToClipboard: copyToClipboard,
     openNewTab: openNewTab
   }, function() {
@@ -14,7 +20,7 @@ function save_options() {
 }
 
 function restore_options() {
-  chrome.storage.sync.get({
+  browser.storage.sync.get({
     copyToClipboard: true,
     openNewTab: true
   }, function(items) {

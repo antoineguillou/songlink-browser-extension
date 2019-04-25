@@ -1,3 +1,9 @@
+window.browser = (function () {
+  return window.msBrowser ||
+    window.browser ||
+    window.chrome;
+})();
+
 var supportedDomains = [
   'song.link/',
   'itunes.apple.com/',
@@ -36,12 +42,12 @@ var isSupportedUrl = function(url) {
 };
 
 var updateTabIcon = function(tab) {
-  chrome.tabs.query({ active: true, lastFocusedWindow: true }, function(tabs) {
+  browser.tabs.query({ active: true, lastFocusedWindow: true }, function(tabs) {
     if(tabs[0]){
       var url = tabs[0].url;
       var tabId = tabs[0].id
       if (isSupportedUrl(url)) {
-        chrome.pageAction.show(tabId);
+        browser.pageAction.show(tabId);
       }
     }
   });
@@ -65,11 +71,11 @@ var copyToClipboard = function(text, tabs) {
     document.getSelection().removeAllRanges();
     document.getSelection().addRange(selected);
   }
-  chrome.tabs.sendMessage(tabs[0].id, {action: "message", message: "Songlink copied to clipboard"});
+  browser.tabs.sendMessage(tabs[0].id, {action: "message", message: "Songlink copied to clipboard"});
 };
 
 var doActions = function(url, tabs) {
-  chrome.storage.sync.get(
+  browser.storage.sync.get(
     {
       copyToClipboard: true,
       openNewTab: true
@@ -79,7 +85,7 @@ var doActions = function(url, tabs) {
         copyToClipboard(url, tabs);
       }
       if (items.openNewTab) {
-        chrome.tabs.create({ url: url });
+        browser.tabs.create({ url: url });
       }
     }
   );
@@ -92,18 +98,18 @@ var getSonglinkUrl = function(url) {
 };
 
 // Update Icon if URL is valid
-chrome.tabs.onUpdated.addListener(function(tab) {
+browser.tabs.onUpdated.addListener(function(tab) {
   updateTabIcon(tab);
 });
 
 // Click action
-chrome.pageAction.onClicked.addListener(function(tab) {
-  chrome.tabs.query({ active: true, lastFocusedWindow: true }, function(tabs) {
+browser.pageAction.onClicked.addListener(function(tab) {
+  browser.tabs.query({ active: true, lastFocusedWindow: true }, function(tabs) {
     var tab = tabs[0];
     var url = tab.url;
 
     if (url.indexOf('play.google.com/music') > -1) {
-      return chrome.tabs.sendMessage(
+      return browser.tabs.sendMessage(
         tab.id,
         { action: 'get_googlemusic_id' },
         function(response) {

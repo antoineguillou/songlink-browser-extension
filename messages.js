@@ -1,3 +1,9 @@
+window.browser = (function () {
+  return window.msBrowser ||
+    window.browser ||
+    window.chrome;
+})();
+
 var createMessage = function(text){
   var el = document.createElement('div');
   var textnode = document.createTextNode(text);
@@ -30,7 +36,7 @@ var createMessage = function(text){
     }, 350);
   }, 2000);
 }
-chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
+browser.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
   if (msg.action == 'message') {
     createMessage(msg.message);
     sendResponse();
