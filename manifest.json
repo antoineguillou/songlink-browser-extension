@@ -20,6 +20,7 @@
       "matches": [
         "https://*.song.link/*",
         "*://itunes.apple.com/*",
+        "*://music.apple.com/*",
         "*://*.itun.es/*",
         "*://*.spotify.com/*",
         "*://*.youtube.com/*",
