@@ -7,6 +7,7 @@ window.browser = (function () {
 var supportedDomains = [
   'song.link/',
   'itunes.apple.com/',
+  'music.apple.com/',
   'itun.es/',
   'open.spotify.com/track/',
   'open.spotify.com/album/',
