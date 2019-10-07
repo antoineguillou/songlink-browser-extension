@@ -1,19 +1,13 @@
 {
   "manifest_version": 2,
   "name": "Songlink",
+  "version": "1.5.2",
   "description": "Share music with Songlink. ",
-  "version": "1.5.1",
   "author": "@starfennec",
   "homepage_url": "https://songlink.glitch.me/",
   "background": {
     "scripts": ["script.js"],
     "persistent": false
-  },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "songlink@song.link",
-      "strict_min_version": "48.0"
-    }
   },
   "content_scripts": [
     {
@@ -29,7 +23,7 @@
         "*://*.tidal.com/*",
         "*://*.napster.com/*",
         "*://play.google.com/music/*",
-        "*://play.google.com/store/*",
+        "*://play.google.com/store/music/*",
         "*://*.soundcloud.com/*",
         "*://music.amazon.com/*",
         "*://*.amazon.com/*",
@@ -78,6 +72,7 @@
   "permissions": [
     "activeTab",
     "clipboardWrite",
+    "contextMenus",
     "storage",
     "tabs"
   ]

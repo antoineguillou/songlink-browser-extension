@@ -4,36 +4,37 @@ window.browser = (function () {
     window.chrome;
 })();
 
+var prependUrl = 'https://song.link/';
+
 var supportedDomains = [
-  'song.link/',
-  'itunes.apple.com/',
-  'music.apple.com/',
-  'itun.es/',
-  'open.spotify.com/track/',
-  'open.spotify.com/album/',
-  'play.spotify.com/track/',
-  'play.spotify.com/album/',
+  'song.link',
+  'itunes.apple.com',
+  'music.apple.com',
+  'itun.es',
+  'open.spotify.com/track',
+  'open.spotify.com/album',
+  'play.spotify.com/track',
+  'play.spotify.com/album',
   'youtube.com/watch',
-  'youtube.com/embed/',
-  'youtu.be/',
-  'music.youtube.com/',
-  'deezer.com/track/',
-  'deezer.com/album/',
-  'tidal.com/track/',
-  'tidal.com/browse/track/',
-  'tidal.com/album/',
-  'tidal.com/browse/album/',
+  'youtube.com/embed',
+  'youtu.be',
+  'music.youtube.com',
+  'deezer.com',
+  'tidal.com/track',
+  'tidal.com/browse/track',
+  'tidal.com/album',
+  'tidal.com/browse/album',
   'napster.com',
-  'play.google.com/music/',
-  'play.google.com/store/',
-  'soundcloud.com/',
-  'music.amazon.com/albums/',
-  'amazon.com/',
-  'music.yandex.com/',
-  'music.yandex.ru/',
-  'spinrilla.com/mixtapes/',
-  'spinrilla.com/songs/',
-  'pandora.com/'
+  'play.google.com/music',
+  'play.google.com/store/music',
+  'soundcloud.com',
+  'music.amazon.com/albums',
+  'amazon.com',
+  'music.yandex.com',
+  'music.yandex.ru',
+  'spinrilla.com/mixtapes',
+  'spinrilla.com/songs',
+  'pandora.com'
 ];
 
 var isSupportedUrl = function(url) {
@@ -42,19 +43,27 @@ var isSupportedUrl = function(url) {
   });
 };
 
-var updateTabIcon = function(tab) {
-  browser.tabs.query({ active: true, lastFocusedWindow: true }, function(tabs) {
-    if(tabs[0]){
-      var url = tabs[0].url;
-      var tabId = tabs[0].id
-      if (isSupportedUrl(url)) {
-        browser.pageAction.show(tabId);
-      }
-    }
-  });
+var getSonglinkUrl = function(url) {
+  return prependUrl + encodeURI(url);
 };
 
-var copyToClipboard = function(text, tabs) {
+var navigationActions = function(tab, changeInfo){
+  if(changeInfo.url){
+    browser.contextMenus.removeAll();
+    browser.pageAction.hide(tab);
+
+    if(isSupportedUrl(changeInfo.url)){
+      browser.pageAction.show(tab);
+      browser.contextMenus.create({
+        id: "get-songlink",
+        title: "Songlink",
+        contexts: ["page", "link"]
+      });
+    }
+  }
+}
+
+var copyToClipboard = function(text, tab) {
   var selected = false;
   var el = document.createElement('textarea');
   el.value = text;
@@ -72,10 +81,32 @@ var copyToClipboard = function(text, tabs) {
     document.getSelection().removeAllRanges();
     document.getSelection().addRange(selected);
   }
-  browser.tabs.sendMessage(tabs[0].id, {action: "message", message: "Songlink copied to clipboard"});
+  browser.tabs.sendMessage(tab.id, {action: "message", message: "Songlink copied to clipboard"});
 };
 
-var doActions = function(url, tabs) {
+var checkUrlType = function(url, tab){
+  if (url.indexOf('play.google.com/music') > -1) {
+    return browser.tabs.sendMessage(
+      tab.id,
+      { action: 'get_googlemusic_id' },
+      function(response) {
+        var id = response.id;
+        if (id !== null) {
+          var gpmUrl = 'https://play.google.com/music/m/' + id;
+          var songlinkUrl = getSonglinkUrl(gpmUrl);
+          return doActions(songlinkUrl, tab);
+        }
+      }
+    );
+  } else if (isSupportedUrl(url)) {
+    var songlinkUrl = getSonglinkUrl(url);
+    return doActions(songlinkUrl, tab);
+  } else {
+    browser.tabs.sendMessage(tab.id, {action: "message", message: "Not a valid Songlink URL"});
+  }
+}
+
+var doActions = function(url, tab) {
   browser.storage.sync.get(
     {
       copyToClipboard: true,
@@ -83,7 +114,7 @@ var doActions = function(url, tabs) {
     },
     function(items) {
       if (items.copyToClipboard) {
-        copyToClipboard(url, tabs);
+        copyToClipboard(url, tab);
       }
       if (items.openNewTab) {
         browser.tabs.create({ url: url });
@@ -92,41 +123,22 @@ var doActions = function(url, tabs) {
   );
 };
 
-var prependUrl = 'https://song.link/';
-
-var getSonglinkUrl = function(url) {
-  return prependUrl + encodeURI(url);
-};
-
-// Update Icon if URL is valid
-browser.tabs.onUpdated.addListener(function(tab) {
-  updateTabIcon(tab);
-});
+// Tab update
+browser.tabs.onUpdated.addListener(navigationActions);
 
 // Click action
 browser.pageAction.onClicked.addListener(function(tab) {
-  browser.tabs.query({ active: true, lastFocusedWindow: true }, function(tabs) {
-    var tab = tabs[0];
     var url = tab.url;
+    checkUrlType(url, tab);
+});
 
-    if (url.indexOf('play.google.com/music') > -1) {
-      return browser.tabs.sendMessage(
-        tab.id,
-        { action: 'get_googlemusic_id' },
-        function(response) {
-          var id = response.id;
-          if (id !== null) {
-            var gpmUrl = 'https://play.google.com/music/m/' + id;
-            var songlinkUrl = getSonglinkUrl(gpmUrl);
-            return doActions(songlinkUrl, tabs);
-          }
-        }
-      );
+// Context menu action
+browser.contextMenus.onClicked.addListener(function(e,tab){
+  if (e.menuItemId == "get-songlink") {
+    if(e.linkUrl){
+      checkUrlType(e.linkUrl, tab);
+    } else if(e.pageUrl){
+      checkUrlType(e.pageUrl, tab);
     }
-
-    if (isSupportedUrl(url)) {
-      var songlinkUrl = getSonglinkUrl(url);
-      return doActions(songlinkUrl, tabs);
-    }
-  });
+  }
 });
