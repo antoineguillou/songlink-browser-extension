@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Songlink",
-  "version": "1.5.2",
+  "version": "1.6",
   "description": "Share music with Songlink. ",
   "author": "@starfennec",
   "homepage_url": "https://songlink.glitch.me/",
@@ -22,8 +22,6 @@
         "*://*.deezer.com/*",
         "*://*.tidal.com/*",
         "*://*.napster.com/*",
-        "*://play.google.com/music/*",
-        "*://play.google.com/store/music/*",
         "*://*.soundcloud.com/*",
         "*://music.amazon.com/*",
         "*://*.amazon.com/*",
@@ -36,8 +34,11 @@
       "js": ["messages.js"]
     },
     {
-      "matches": ["*://play.google.com/music/*"],
-      "js": ["googlePlayMusic.js"]
+      "matches": [
+        "*://*.youtube.com/*",
+        "*://*.youtu.be/*"
+      ],
+      "js": ["youtubeId.js"]
     }
  ],
   "page_action": {

@@ -16,6 +16,7 @@ var supportedDomains = [
   'play.spotify.com/track',
   'play.spotify.com/album',
   'youtube.com/watch',
+  'youtube.com/playlist',
   'youtube.com/embed',
   'youtu.be',
   'music.youtube.com',
@@ -25,8 +26,6 @@ var supportedDomains = [
   'tidal.com/album',
   'tidal.com/browse/album',
   'napster.com',
-  'play.google.com/music',
-  'play.google.com/store/music',
   'soundcloud.com',
   'music.amazon.com/albums',
   'amazon.com',
@@ -85,15 +84,18 @@ var copyToClipboard = function(text, tab) {
 };
 
 var checkUrlType = function(url, tab){
-  if (url.indexOf('play.google.com/music') > -1) {
+  if (url.indexOf('youtube.com') > -1 || url.indexOf('youtu.be') > -1) {
     return browser.tabs.sendMessage(
       tab.id,
-      { action: 'get_googlemusic_id' },
+      { action: 'get_youtube_id' },
       function(response) {
-        var id = response.id;
-        if (id !== null) {
-          var gpmUrl = 'https://play.google.com/music/m/' + id;
-          var songlinkUrl = getSonglinkUrl(gpmUrl);
+        if (response.id) {
+          var id = response.id;
+          var ytUrl = 'https://youtube.com/watch?v=' + id;
+          var songlinkUrl = getSonglinkUrl(ytUrl);
+          return doActions(songlinkUrl, tab);
+        } else {
+          var songlinkUrl = getSonglinkUrl(url);
           return doActions(songlinkUrl, tab);
         }
       }
